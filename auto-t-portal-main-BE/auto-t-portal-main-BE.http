@@ -1,0 +1,6 @@
+@auto_t_portal_main_BE_HostAddress = http://localhost:5196
+
+GET {{auto_t_portal_main_BE_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
