@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
         builder.Entity<Car>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Appointment>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Order>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<CarImage>().HasQueryFilter(e => !e.Car.IsDeleted);
 
         builder.Entity<User>(e =>
         {
@@ -46,3 +47,4 @@ public class AppDbContext : DbContext
         });
     }
 }
+

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using auto_t_portal_main_BE.Models.DTOs;
 
 namespace auto_t_portal_main_BE.Middlewares;
 
@@ -25,15 +26,20 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled exception");
-            await WriteResponse(context, HttpStatusCode.InternalServerError, "Đã xảy ra lỗi hệ thống.");
+            logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
+            await WriteResponse(context, HttpStatusCode.InternalServerError,
+                "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
         }
     }
 
-    private static async Task WriteResponse(HttpContext context, HttpStatusCode code, string message)
+    private static async Task WriteResponse(
+        HttpContext context, HttpStatusCode code, string message)
     {
         context.Response.StatusCode = (int)code;
         context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(JsonSerializer.Serialize(new { error = message }));
+        var body = JsonSerializer.Serialize(
+            ApiResponse<object>.Fail(message),
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        await context.Response.WriteAsync(body);
     }
 }
