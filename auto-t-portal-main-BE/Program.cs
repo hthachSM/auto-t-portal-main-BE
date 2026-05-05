@@ -94,6 +94,8 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAiService, AiService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IContractService, ContractService>();
+builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 
 // ── CORS ───────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
@@ -142,6 +144,10 @@ using (var scope = app.Services.CreateScope())
         var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         log.LogWarning("Seed data skipped: {Message}", ex.Message);
     }
+    builder.Services.AddScoped<IContractService, ContractService>();
+    builder.Services.AddScoped<IDeliveryService, DeliveryService>();
+
 }
 
 app.Run();
+

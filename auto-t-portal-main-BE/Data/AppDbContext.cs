@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<CarImage> CarImages => Set<CarImage>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Contract> Contracts => Set<Contract>();
+    public DbSet<Delivery> Deliveries => Set<Delivery>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -21,6 +23,8 @@ public class AppDbContext : DbContext
         builder.Entity<Car>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Appointment>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Order>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<Contract>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<Delivery>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<CarImage>().HasQueryFilter(e => !e.Car.IsDeleted);
 
         builder.Entity<User>(e =>
@@ -45,6 +49,17 @@ public class AppDbContext : DbContext
         {
             e.Property(o => o.DepositAmount).HasColumnType("decimal(18,2)");
         });
+
+        builder.Entity<Contract>(e =>
+        {
+            e.Property(c => c.TotalAmount).HasColumnType("decimal(18,2)");
+            e.Property(c => c.DepositAmount).HasColumnType("decimal(18,2)");
+            e.Property(c => c.RemainingAmount).HasColumnType("decimal(18,2)");
+            e.HasIndex(c => c.ContractNumber).IsUnique();
+            e.HasOne(c => c.Delivery)
+             .WithOne(d => d.Contract)
+             .HasForeignKey<Delivery>(d => d.ContractId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }
-
