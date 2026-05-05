@@ -12,21 +12,19 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Controllers & Validation ───────────────────────────────────────────────
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
 });
 builder.Services.AddEndpointsApiExplorer();
 
-// ── Swagger ────────────────────────────────────────────────────────────────
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "AutoT API",
         Version = "v1",
-        Description = "Hệ thống thương mại điện tử ô tô thông minh"
+        Description = "He thong thuong mai dien tu o to thong minh"
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -35,7 +33,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Nhập: Bearer {token}"
+        Description = "Nhap: Bearer {token}"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -53,11 +51,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ── Database ───────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// ── JWT Authentication ─────────────────────────────────────────────────────
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -77,14 +73,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-
-// ── Rate Limiting ──────────────────────────────────────────────────────────
 builder.Services.AddRateLimiting(builder.Configuration);
-
-// ── HttpClient ─────────────────────────────────────────────────────────────
 builder.Services.AddHttpClient();
 
-// ── Dependency Injection ───────────────────────────────────────────────────
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddScoped<VnPayHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -97,7 +88,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 
-// ── CORS ───────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -111,7 +101,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ── Middleware Pipeline ────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -131,7 +120,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// ── Seed Data ──────────────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     try
@@ -144,10 +132,6 @@ using (var scope = app.Services.CreateScope())
         var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         log.LogWarning("Seed data skipped: {Message}", ex.Message);
     }
-    builder.Services.AddScoped<IContractService, ContractService>();
-    builder.Services.AddScoped<IDeliveryService, DeliveryService>();
-
 }
 
 app.Run();
-
